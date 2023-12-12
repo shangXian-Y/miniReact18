@@ -16,17 +16,17 @@ export const createUpdate = <State>(action: Action<State>): Update<State> => {
   };
 };
 // 创建UpdateQueue实例
-export const createUpdateQueue = <Action>() => {
+export const createUpdateQueue = <State>() => {
   return {
     shared: {
       pending: null,
     },
-  } as UpdateQueue<Action>;
+  } as UpdateQueue<State>;
 };
 // 将Update存入UpdateQueue
-export const enqueueUpdate = <Action>(
-  updateQueue: UpdateQueue<Action>,
-  update: Update<Action>
+export const enqueueUpdate = <State>(
+  updateQueue: UpdateQueue<State>,
+  update: Update<State>
 ) => {
   updateQueue.shared.pending = update;
 };
