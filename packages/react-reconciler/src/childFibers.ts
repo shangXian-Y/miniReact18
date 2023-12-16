@@ -25,6 +25,7 @@ function ChildReconciler(shouldTrackEffects: boolean) {
     fiber.return = returnFiber;
     return fiber;
   }
+
   // 根据shouldTrackEffects判断是否插入副作用
   function placeSingleChild(fiber: FiberNode) {
     if (shouldTrackEffects && fiber.alternate === null) {
@@ -34,7 +35,7 @@ function ChildReconciler(shouldTrackEffects: boolean) {
   }
 
   return function reconcileChildrenFibers(
-    retuernFiber: FiberNode,
+    returnFiber: FiberNode,
     currentFiber: FiberNode | null,
     newChild?: ReactElementType | null
   ) {
@@ -43,10 +44,12 @@ function ChildReconciler(shouldTrackEffects: boolean) {
       switch (newChild.$$typeof) {
         case REACT_ELEMENT_TYPE:
           return placeSingleChild(
-            reconcileSingleElement(retuernFiber, currentFiber, newChild)
+            reconcileSingleElement(returnFiber, currentFiber, newChild)
           );
         default:
-          console.warn("未实现的reconcile类型", newChild);
+          if (__DEV__) {
+            console.warn("未实现的reconcile类型", newChild);
+          }
           break;
       }
     }
@@ -55,11 +58,13 @@ function ChildReconciler(shouldTrackEffects: boolean) {
     // HostText
     if (typeof newChild === "string" || typeof newChild === "number") {
       return placeSingleChild(
-        reconcileSingleTextNode(retuernFiber, currentFiber, newChild)
+        reconcileSingleTextNode(returnFiber, currentFiber, newChild)
       );
     }
 
-    console.warn("未实现的reconcile类型-2", newChild);
+    if (__DEV__) {
+      console.warn("未实现的reconcile类型-2", newChild);
+    }
     return null;
   };
 }

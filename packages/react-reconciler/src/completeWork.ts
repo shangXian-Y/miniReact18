@@ -1,4 +1,5 @@
 import {
+  Container,
   createInstance,
   appendInitialChild,
   createTextInstance,
@@ -6,7 +7,6 @@ import {
 import { FiberNode } from "./fiber";
 import { HostComponent, HostRoot, HostText } from "./workTags";
 import { NoFlags } from "./fiberFlags";
-import { Container } from "./hostConfig";
 
 export const completeWork = (wip: FiberNode) => {
   // 递归中的 归 阶段
@@ -27,7 +27,7 @@ export const completeWork = (wip: FiberNode) => {
       }
       bubbleProperties(wip);
       return null;
-    case HostRoot:
+    case HostText:
       if (current !== null && wip.stateNode) {
         // update
       } else {
@@ -37,13 +37,14 @@ export const completeWork = (wip: FiberNode) => {
       }
       bubbleProperties(wip);
       return null;
-    case HostText:
+    case HostRoot:
       bubbleProperties(wip);
       return null;
 
     default:
-      console.warn("未处理的completeWork归阶段的情况", wip);
-
+      if (__DEV__) {
+        console.warn("未处理的completeWork归阶段的情况", wip);
+      }
       break;
   }
 };
@@ -71,7 +72,7 @@ function appendAllChildren(parent: Container, wip: FiberNode) {
       }
       node = node?.return;
     }
-    node.sibling.child = node.return;
+    node.sibling.return = node.return;
     node = node.sibling;
   }
 }

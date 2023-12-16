@@ -15,7 +15,9 @@ export const beginWork = (wip: FiberNode) => {
     case HostText:
       return null;
     default:
-      console.warn("beginWork未实现的类型", wip);
+      if (__DEV__) {
+        console.warn("beginWork未实现的类型", wip);
+      }
       break;
   }
   return null;

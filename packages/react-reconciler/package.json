@@ -2,7 +2,7 @@
   "name": "react-reconciler",
   "version": "1.0.0",
   "description": "react-reconciler协调器",
-  "main": "index.js",
+  "module": "index.ts",
   "dependencies": {
     "shared": "workspace: *"
   },
