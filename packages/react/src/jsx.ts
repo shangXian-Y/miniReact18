@@ -1,6 +1,14 @@
 import { REACT_ELEMENT_TYPE } from "shared/ReactSymbols";
-import { Type, Key, Ref, Props, ReactElementType } from "shared/ReactTypes";
-// ReactEelement
+import {
+  Type,
+  Key,
+  Ref,
+  Props,
+  ReactElementType,
+  ElementType,
+} from "shared/ReactTypes";
+
+// ReactElement
 
 const ReactElement = function (
   type: Type,
@@ -14,73 +22,71 @@ const ReactElement = function (
     key,
     ref,
     props,
-    __make: "yangY",
+    __mark: "YangY",
   };
-
   return element;
 };
 
-export const jsx = (
-  type: ReactElementType,
-  config: any,
-  ...maybeChildren: any
-) => {
+export const jsx = (type: ElementType, config: any, ...maybeChildren: any) => {
+  console.log("进入jsx");
   let key: Key = null;
   const props: Props = {};
   let ref: Ref = null;
 
   for (const prop in config) {
-    let val = config[prop];
+    const val = config[prop];
     if (prop === "key") {
-      if (val != undefined) {
-        key = val + "";
+      if (val !== undefined) {
+        key = "" + val;
       }
       continue;
     }
     if (prop === "ref") {
-      if (val != undefined) {
-        ref = val + "";
+      if (val !== undefined) {
+        ref = val;
       }
       continue;
     }
     if ({}.hasOwnProperty.call(config, prop)) {
       props[prop] = val;
     }
-    const maybeChildrenLength = maybeChildren.length;
-    if (maybeChildrenLength) {
-      if (maybeChildrenLength === 1) {
-        props.children = maybeChildren[0];
-      } else {
-        props.children = maybeChildren;
-      }
-    }
-    return ReactElement(type, key, ref, props);
   }
+  const maybeChildrenLength = maybeChildren.length;
+  if (maybeChildrenLength) {
+    if (maybeChildrenLength === 1) {
+      props.children = maybeChildren[0];
+    } else {
+      props.children = maybeChildren;
+    }
+  }
+  return ReactElement(type, key, ref, props);
 };
 
-export const jsxDEV = (type: ReactElementType, config: any) => {
+export const jsxDEV = (type: ElementType, config: any) => {
+  console.log("进入jsxDEV");
+
   let key: Key = null;
   const props: Props = {};
   let ref: Ref = null;
 
   for (const prop in config) {
-    let val = config[prop];
+    const val = config[prop];
     if (prop === "key") {
-      if (val != undefined) {
-        key = val + "";
+      if (val !== undefined) {
+        key = "" + val;
       }
       continue;
     }
     if (prop === "ref") {
-      if (val != undefined) {
-        ref = val + "";
+      if (val !== undefined) {
+        ref = val;
       }
       continue;
     }
     if ({}.hasOwnProperty.call(config, prop)) {
       props[prop] = val;
     }
-
-    return ReactElement(type, key, ref, props);
   }
+
+  return ReactElement(type, key, ref, props);
 };

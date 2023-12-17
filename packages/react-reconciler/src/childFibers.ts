@@ -61,7 +61,7 @@ function ChildReconciler(shouldTrackEffects: boolean) {
         reconcileSingleTextNode(returnFiber, currentFiber, newChild)
       );
     }
-
+    console.log(123);
     if (__DEV__) {
       console.warn("未实现的reconcile类型-2", newChild);
     }

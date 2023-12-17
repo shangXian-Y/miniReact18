@@ -4,7 +4,8 @@
   "description": "react公共方法",
   "module": "index.ts",
   "scripts": {
-    "build:dev": "rimraf dist && rollup --bundleConfigAsCjs --config scripts/rollup/dev.config.js"
+    "build:dev": "rimraf dist && rollup --bundleConfigAsCjs --config scripts/rollup/dev.config.js",
+    "vite": "vite serve demos/test-fc --config scripts/vite/vite.config.js --force"
   },
   "keywords": [],
   "author": "",
@@ -23,7 +24,11 @@
     "rollup": "^4.6.0",
     "rollup-plugin-generate-package-json": "^3.2.0",
     "rollup-plugin-typescript2": "^0.36.0",
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.2",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8"
   },
   "dependencies": {
     "@rollup/plugin-replace": "^5.0.5"

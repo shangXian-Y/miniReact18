@@ -8,9 +8,9 @@ export interface ReactElementType {
   $$typeof: symbol | number;
   type: ElementType;
   key: Key;
-  ref: Ref;
   props: Props;
-  __make: string;
+  ref: Ref;
+  __mark: string;
 }
 
 export type Action<State> = State | ((prevState: State) => State);

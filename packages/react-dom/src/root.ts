@@ -9,9 +9,11 @@ import { Container } from "./hostConfig";
 
 export function createRoot(container: Container) {
   const root = createContainer(container);
+  console.log("render-root", root);
 
   return {
     render(element: ReactElementType) {
+      console.log("render-element", element);
       updateContainer(element, root);
     },
   };
