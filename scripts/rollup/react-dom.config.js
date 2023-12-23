@@ -16,12 +16,12 @@ export default [
     output: [
       {
         file: `${pkgDistPath}/index.js`,
-        name: 'index.js',
+        name: 'ReactDOM',
         format: 'umd'
       },
       {
         file: `${pkgDistPath}/client.js`,
-        name: 'client.js',
+        name: 'client',
         format: 'umd'
       }
     ],
@@ -40,5 +40,18 @@ export default [
           name, description, version, peerDependencies: { react: version }, main: 'index.js'
         })
       })]
+  },
+  // raect-test-utils
+  {
+    input: `${pkgPath}/test-utils.ts`,
+    output: [
+      {
+        file: `${pkgDistPath}/test-utils.js`,
+        name: 'testUtils.js',
+        format: 'umd'
+      }
+    ],
+    external: ['raect', 'react-dom'],
+    plugins: getBaseRollupPlugins()
   }
 ]
