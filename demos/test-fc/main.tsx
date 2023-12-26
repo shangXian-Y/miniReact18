@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 
 function App() {
-  const [num] = useState(100);
+  const [num, setnum] = useState(100);
   return (
     <div>
       {/* <span>MiniReact!</span> */}

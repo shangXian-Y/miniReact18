@@ -11,7 +11,12 @@ import {
   HostRoot,
   HostText,
 } from "./workTags";
-import { NoFlags } from "./fiberFlags";
+import { NoFlags, Update } from "./fiberFlags";
+
+// 标记更新
+function markUpdate(wip: FiberNode) {
+  wip.flags |= Update;
+}
 
 export const completeWork = (wip: FiberNode) => {
   // 递归中的 归 阶段
@@ -35,6 +40,11 @@ export const completeWork = (wip: FiberNode) => {
     case HostText:
       if (current !== null && wip.stateNode) {
         // update
+        const oldText = current.memoizedProps.content;
+        const newText = newProps.content;
+        if (oldText !== newText) {
+          markUpdate(wip);
+        }
       } else {
         // mount  1.创建DOM
         const instance = createTextInstance(newProps.content);
