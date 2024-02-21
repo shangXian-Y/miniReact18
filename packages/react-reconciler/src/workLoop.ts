@@ -4,6 +4,15 @@ import { beginWork } from "./beginWork";
 import { HostRoot } from "./workTags";
 import { MutationMask, NoFlags } from "./fiberFlags";
 import { commitMutationEffects } from "./commitWork";
+import {
+  Lane,
+  NoLane,
+  SyncLane,
+  getHighestPriorityLane,
+  mergeLanes,
+} from "./fiberLanes";
+import { flushSyncCallbacks, scheduleSyncCallback } from "./syncTaskQueue";
+import { scheduleMicroTask } from "hostConfig";
 
 let workInProgress: FiberNode | null = null;
 
@@ -11,11 +20,34 @@ function perpareFreshStack(root: FiberRootNode) {
   workInProgress = createWorkInProgress(root.current, {});
 }
 
-export function scheduleUpdateOnFiber(fiber: FiberNode) {
+export function scheduleUpdateOnFiber(fiber: FiberNode, lane: Lane) {
   // TODO 调度功能
   // root --> FiberRootNode
   const root = markUpdateFromFiberToRoot(fiber);
-  renderRoot(root);
+  markRootUpdate(root, lane);
+  ensureRootIsScheduled(root);
+}
+
+// schedule阶段入口 调度阶段入口
+function ensureRootIsScheduled(root: FiberRootNode) {
+  const updateLane = getHighestPriorityLane(root.pendingLanes);
+  if (updateLane === NoLane) {
+    return;
+  }
+  if (updateLane === SyncLane) {
+    // 同步优先级 用微任务调度
+    if (__DEV__) {
+      console.log("在微任务中更新，优先级：", updateLane);
+    }
+    scheduleSyncCallback(performSyncWorkOnRoot.bind(null, root, updateLane));
+    scheduleMicroTask(flushSyncCallbacks);
+  } else {
+    // 其他优先级 用宏任务调度
+  }
+}
+
+function markRootUpdate(root: FiberRootNode, lane: Lane) {
+  root.pendingLanes = mergeLanes(root.pendingLanes, lane);
 }
 
 function markUpdateFromFiberToRoot(fiber: FiberNode) {
@@ -31,7 +63,17 @@ function markUpdateFromFiberToRoot(fiber: FiberNode) {
   return null;
 }
 
-function renderRoot(root: FiberRootNode) {
+function performSyncWorkOnRoot(root: FiberRootNode, lane: Lane) {
+  const nextLane = getHighestPriorityLane(root.pendingLanes);
+
+  if (nextLane !== SyncLane) {
+    // 1.其他比SyncLane低的优先级
+    // 2.NoLane
+    // 初上上述2种情况下，重新进行一次调度
+    ensureRootIsScheduled(root);
+    return;
+  }
+
   // 初始化
   perpareFreshStack(root);
 
