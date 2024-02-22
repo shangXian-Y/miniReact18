@@ -12,12 +12,12 @@ function App() {
   return (
     <ul
       onClickCapture={() => {
-        setnum(num + 1);
+        setnum((num) => num + 1);
+        setnum((num) => num + 1);
+        setnum((num) => num + 1);
       }}
     >
-      <li>3</li>
-      <li>4</li>
-      {arr}
+      {num}
     </ul>
   );
 }

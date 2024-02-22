@@ -3,6 +3,7 @@ let syncQueue: ((...args: any) => void)[] | null = null;
 let isFlushingSyncQueue: boolean = false;
 
 export function scheduleSyncCallback(callback: (...args: any) => void) {
+  console.log("scheduleSyncCallback执行", syncQueue);
   if (syncQueue === null) {
     syncQueue = [callback];
   } else {
