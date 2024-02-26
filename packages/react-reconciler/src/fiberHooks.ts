@@ -90,6 +90,7 @@ function updateState<State>(
   // 计算新state的逻辑
   const queue = hook.updateQueue as UpdateQueue<State>;
   const pending = queue.shared.pending;
+  queue.shared.pending = null;
 
   if (pending !== null) {
     const { memoizedState } = processUpdateQueue(
