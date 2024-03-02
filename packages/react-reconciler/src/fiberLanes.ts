@@ -11,7 +11,7 @@ export function mergeLanes(laneA: Lane, laneB: Lane): Lanes {
   return laneA | laneB;
 }
 
-export function requestUpdateLanes() {
+export function requestUpdateLane() {
   return SyncLane;
 }
 

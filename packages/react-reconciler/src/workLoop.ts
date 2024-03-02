@@ -1,9 +1,19 @@
-import { FiberNode, FiberRootNode, createWorkInProgress } from "./fiber";
+import {
+  FiberNode,
+  FiberRootNode,
+  PendingPassiveEffects,
+  createWorkInProgress,
+} from "./fiber";
 import { completeWork } from "./completeWork";
 import { beginWork } from "./beginWork";
 import { HostRoot } from "./workTags";
-import { MutationMask, NoFlags } from "./fiberFlags";
-import { commitMutationEffects } from "./commitWork";
+import { MutationMask, NoFlags, PassiveMark } from "./fiberFlags";
+import {
+  commitHookEffectListCreate,
+  commitHookEffectListDestory,
+  commitHookEffectListUnmount,
+  commitMutationEffects,
+} from "./commitWork";
 import {
   Lane,
   NoLane,
@@ -14,9 +24,15 @@ import {
 } from "./fiberLanes";
 import { flushSyncCallbacks, scheduleSyncCallback } from "./syncTaskQueue";
 import { scheduleMicroTask } from "hostConfig";
+import {
+  unstable_scheduleCallback as scheduleCallback,
+  unstable_NormalPriority as NormalPriority,
+} from "scheduler";
+import { HookHasEffect, Passive } from "./hookEffectTags";
 
 let workInProgress: FiberNode | null = null;
 let wipRootRenderLane: Lane = NoLane;
+let rootDoesHasPassiveEffects: boolean = false;
 
 function perpareFreshStack(root: FiberRootNode, lane: Lane) {
   workInProgress = createWorkInProgress(root.current, {});
@@ -117,22 +133,59 @@ function commitRoot(root: FiberRootNode) {
   // 移除已经处理过的lane
   markRootFinished(root, lane);
 
+  if (
+    (finishedWork.flags & PassiveMark) !== NoFlags ||
+    (finishedWork.subtreeFlags & PassiveMark) !== NoFlags
+  ) {
+    // 防止多次执行commitRoot时，多次进行调度
+    if (!rootDoesHasPassiveEffects) {
+      rootDoesHasPassiveEffects = true;
+      // 调度副作用
+      scheduleCallback(NormalPriority, () => {
+        // 执行副作用
+        flushPassiveEffects(root.pendingPassiveEffects);
+        // TODO: 并发更新时讲解return
+        return;
+      });
+    }
+  }
+
   // 判断是否存在3个子阶段需要执行的操作
   // root flags 和 root subtreeFlags
   const subtreeHasEffent =
-    (finishedWork.subtreeFlags & MutationMask) !== NoFlags;
-  const rootHasEffent = (finishedWork.flags & MutationMask) !== NoFlags;
+    (finishedWork.subtreeFlags & (MutationMask | PassiveMark)) !== NoFlags;
+  const rootHasEffent =
+    (finishedWork.flags & (MutationMask | PassiveMark)) !== NoFlags;
 
   if (subtreeHasEffent || rootHasEffent) {
     // beforeMutation
     // mutation Placement
-    commitMutationEffects(finishedWork);
+    commitMutationEffects(finishedWork, root);
     // 切换fiber树 --> mutation阶段完成 和 layout阶段开始之间
     root.current = finishedWork;
     // layout
   } else {
     root.current = finishedWork;
   }
+
+  rootDoesHasPassiveEffects = false;
+  ensureRootIsScheduled(root);
+}
+
+function flushPassiveEffects(pendingPassiveEffects: PendingPassiveEffects) {
+  pendingPassiveEffects.unmount.forEach((effect) => {
+    commitHookEffectListUnmount(Passive, effect);
+  });
+  pendingPassiveEffects.unmount = [];
+
+  pendingPassiveEffects.update.forEach((effect) => {
+    commitHookEffectListDestory(Passive | HookHasEffect, effect);
+  });
+  pendingPassiveEffects.update.forEach((effect) => {
+    commitHookEffectListCreate(Passive | HookHasEffect, effect);
+  });
+  pendingPassiveEffects.update = [];
+  flushSyncCallbacks();
 }
 
 function workLoop() {

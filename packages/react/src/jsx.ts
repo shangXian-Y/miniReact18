@@ -65,8 +65,6 @@ export const jsx = (type: ElementType, config: any, ...maybeChildren: any) => {
 export const Fragment = REACT_FRAGMENT_TYPE;
 
 export const jsxDEV = (type: ElementType, config: any) => {
-  console.log("进入jsxDEV");
-
   let key: Key = null;
   const props: Props = {};
   let ref: Ref = null;
