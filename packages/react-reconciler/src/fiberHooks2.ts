@@ -52,10 +52,10 @@ export function renderWithHooks(wip: FiberNode, lane: Lane) {
 
   const current = wip.alternate;
   if (current !== null) {
-    // update阶段
+    // update
     currentDispatcher.current = HooksDispatcherOnUpdate;
   } else {
-    // mount阶段
+    // mount
     currentDispatcher.current = HooksDispatcherOnMount;
   }
   const Component = wip.type;
@@ -81,7 +81,7 @@ const HooksDispatcherOnUpdate: Dispatcher = {
 };
 
 function mountEffect(create: EffectCallback | void, deps: EffectDeps | void) {
-  const hook = mountWorkInProgressHook();
+  const hook = mountWorkInProgresHook();
   const nextDeps = deps === undefined ? null : deps;
   (currentlyRenderingFiber as FiberNode).flags |= PassiveEffect;
 
@@ -94,7 +94,7 @@ function mountEffect(create: EffectCallback | void, deps: EffectDeps | void) {
 }
 
 function updateEffect(create: EffectCallback | void, deps: EffectDeps | void) {
-  const hook = updateWorkInProgressHook();
+  const hook = updateWorkInProgresHook();
   const nextDeps = deps === undefined ? null : deps;
   let destroy: EffectCallback | void;
 
@@ -110,7 +110,7 @@ function updateEffect(create: EffectCallback | void, deps: EffectDeps | void) {
         return;
       }
     }
-    // 浅比较后不相等
+    // 浅比较 不相等
     (currentlyRenderingFiber as FiberNode).flags |= PassiveEffect;
     hook.memoizedState = pushEffect(
       Passive | HookHasEffect,
@@ -177,8 +177,8 @@ function createFCUpdateQueue<State>() {
 }
 
 function updateState<State>(): [State, Dispatch<State>] {
-  // 找到当前useState对应的Hook数据
-  const hook = updateWorkInProgressHook();
+  // 找到当前useState对应的hook数据
+  const hook = updateWorkInProgresHook();
   // 计算新state的逻辑
   const queue = hook.updateQueue as UpdateQueue<State>;
   const pending = queue.shared.pending;
@@ -192,9 +192,8 @@ function updateState<State>(): [State, Dispatch<State>] {
   }
   return [hook.memoizedState, queue.dispatch as Dispatch<State>];
 }
-
-function updateWorkInProgressHook(): Hook {
-  // TODO: render阶段触发的更新
+function updateWorkInProgresHook(): Hook {
+  // TODO render阶段触发的更新
   let nextCurrentHook: Hook | null;
   if (currentHook === null) {
     // 这是这个FC update时的第一个hook
@@ -241,7 +240,7 @@ function mountState<State>(
   initialState: (() => State) | State
 ): [State, Dispatch<State>] {
   // 找到当前useState对应的hook数据
-  const hook = mountWorkInProgressHook();
+  const hook = mountWorkInProgresHook();
   let memoizedState;
   if (initialState instanceof Function) {
     memoizedState = initialState();
@@ -266,8 +265,7 @@ function dispatchSetState<State>(
   enqueueUpdate(updateQueue, update);
   scheduleUpdateOnFiber(fiber, lane);
 }
-
-function mountWorkInProgressHook(): Hook {
+function mountWorkInProgresHook(): Hook {
   const hook: Hook = {
     memoizedState: null,
     updateQueue: null,

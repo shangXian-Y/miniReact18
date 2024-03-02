@@ -128,9 +128,9 @@ function commitHookEffectList(
 
 export function commitHookEffectListUnmount(flags: Flags, lastEffect: Effect) {
   commitHookEffectList(flags, lastEffect, (effect) => {
-    const destory = effect.destory;
-    if (typeof destory === "function") {
-      destory();
+    const destroy = effect.destroy;
+    if (typeof destroy === "function") {
+      destroy();
     }
     effect.tag &= ~HookHasEffect;
   });
@@ -138,9 +138,9 @@ export function commitHookEffectListUnmount(flags: Flags, lastEffect: Effect) {
 
 export function commitHookEffectListDestory(flags: Flags, lastEffect: Effect) {
   commitHookEffectList(flags, lastEffect, (effect) => {
-    const destory = effect.destory;
-    if (typeof destory === "function") {
-      destory();
+    const destroy = effect.destroy;
+    if (typeof destroy === "function") {
+      destroy();
     }
   });
 }
@@ -149,7 +149,7 @@ export function commitHookEffectListCreate(flags: Flags, lastEffect: Effect) {
   commitHookEffectList(flags, lastEffect, (effect) => {
     const create = effect.create;
     if (typeof create === "function") {
-      effect.destory = create();
+      effect.destroy = create();
     }
   });
 }
